@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fiscalización</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1 id="titulo">📋 Fiscalización</h1>
+        
+        <div id="configSection" class="config-section">
+            <div class="alerta-fijate">
+                ⚠️ Antes de ingresar la cantidad de electores, consulte con el presidente de mesa.  
+                Es posible que haya electores adicionales que no figuren en la hoja entregada por su partido.
+            </div>
+            <label>Total de electores en esta mesa:</label>
+            <input type="number" id="totalElectores" value="350" min="1" max="400">
+            <button onclick="iniciarFiscalizacion()">Iniciar Fiscalización</button>
+        </div>
+
+        <div id="mainSection" class="hidden">
+            <div id="message" class="message"></div>
+
+            <div class="display-section">
+                <div id="numberDisplay">-</div>
+            </div>
+
+            <div class="keyboard">
+                <button class="key" onclick="agregarDigito('1')">1</button>
+                <button class="key" onclick="agregarDigito('2')">2</button>
+                <button class="key" onclick="agregarDigito('3')">3</button>
+                <button class="key" onclick="agregarDigito('4')">4</button>
+                <button class="key" onclick="agregarDigito('5')">5</button>
+                <button class="key" onclick="agregarDigito('6')">6</button>
+                <button class="key" onclick="agregarDigito('7')">7</button>
+                <button class="key" onclick="agregarDigito('8')">8</button>
+                <button class="key" onclick="agregarDigito('9')">9</button>
+                <button class="key backspace" onclick="borrarDigito()">⌫</button>
+                <button class="key zero" onclick="agregarDigito('0')">0</button>
+            </div>
+
+            <button id="addBtn" onclick="agregarVoto()">✓ REGISTRAR VOTO</button>
+
+            <div class="bottom-buttons">
+                <button class="status-btn" onclick="mostrarEstado()">📊 Estado</button>
+                <button class="progress-btn" onclick="mostrarProgreso()">📋 Progreso</button>
+            </div>
+
+            <div class="action-buttons">
+                <button id="undoBtn" onclick="deshacerUltimo()">↶ Deshacer</button>
+                <button id="clearBtn" onclick="reiniciar()">🔄 Reiniciar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Estado -->
+    <div id="estadoModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">📊 Estado Actual</div>
+                <button class="close-btn" onclick="cerrarModal('estadoModal')">×</button>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-label">Votaron</div>
+                    <div class="stat-value" id="votosCount">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Total Mesa</div>
+                    <div class="stat-value" id="totalMesa">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Faltan</div>
+                    <div class="stat-value" id="faltanCount">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">% Votó</div>
+                    <div class="stat-value" id="porcentajeVoto">0%</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <!-- Modal Progreso -->
+    <div id="progresoModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">📋 Progreso por Hoja</div>
+                <button class="close-btn" onclick="cerrarModal('progresoModal')">×</button>
+            </div>
+            <div id="sheetsGrid" class="sheets-grid"></div>
+        </div>
+    </div>
+
+    <!-- Modal Detalle Hoja -->
+    <div id="detalleHojaModal" class="modal">
+        <div class="modal-content modal-detalle">
+            <div class="modal-header">
+                <div class="modal-title" id="detalleHojaTitulo">Hoja 1</div>
+                <button class="close-btn" onclick="cerrarModal('detalleHojaModal')">×</button>
+            </div>
+            <div id="numerosGrid" class="numeros-grid"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
