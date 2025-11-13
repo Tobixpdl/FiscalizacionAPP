@@ -1,23 +1,186 @@
-        let totalElectores = 0;
+         let totalElectores = 0;
         let votosRegistrados = new Set();
         let historialVotos = [];
         let hojas = [];
         let numeroActual = '';
+        let fiscalizacionActualId = null;
 
-        function iniciarFiscalizacion() {
-            document.getElementById('titulo').textContent = '📋 Número de orden';
-            const input = document.getElementById('totalElectores').value;
-            totalElectores = parseInt(input);
+        document.addEventListener('DOMContentLoaded', () => {
+            cargarListaFiscalizaciones();
+        });
 
-            if (totalElectores < 1 || totalElectores > 400) {
-                alert('Por favor ingrese un número válido entre 1 y 400');
+        function cargarListaFiscalizaciones() {
+            const fiscalizaciones = obtenerTodasFiscalizaciones();
+            const lista = document.getElementById('listaFiscalizaciones');
+            
+            if (fiscalizaciones.length === 0) {
+                lista.innerHTML = '<div class="sin-fiscalizaciones">No hay fiscalizaciones guardadas</div>';
                 return;
             }
+
+            lista.innerHTML = '';
+            fiscalizaciones.forEach(fisc => {
+                const div = document.createElement('div');
+                div.className = 'item-fiscalizacion';
+                const porcentaje = ((fisc.votosCount / fisc.totalElectores) * 100).toFixed(1);
+                div.innerHTML = `
+                    <div class="fisc-info">
+                        <div class="fisc-nombre">${fisc.nombre}</div>
+                        <div class="fisc-stats">${fisc.votosCount}/${fisc.totalElectores} votos (${porcentaje}%)</div>
+                        <div class="fisc-fecha">${new Date(fisc.fecha).toLocaleString()}</div>
+                    </div>
+                    <div class="fisc-acciones">
+                        <button class="btn-abrir" onclick="abrirFiscalizacion('${fisc.id}')">Abrir</button>
+                        <button class="btn-eliminar" onclick="eliminarFiscalizacion('${fisc.id}')">🗑️</button>
+                    </div>
+                `;
+                lista.appendChild(div);
+            });
+        }
+
+        function obtenerTodasFiscalizaciones() {
+            const keys = Object.keys(localStorage).filter(k => k.startsWith('fisc_'));
+            return keys.map(key => {
+                const data = JSON.parse(localStorage.getItem(key));
+                return {
+                    id: key,
+                    nombre: data.nombre,
+                    totalElectores: data.totalElectores,
+                    votosCount: data.votosRegistrados.length,
+                    fecha: data.fecha
+                };
+            }).sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+        }
+
+        function mostrarConfiguracion() {
+            document.getElementById('seleccionSection').classList.add('hidden');
+            document.getElementById('configSection').classList.remove('hidden');
+            document.getElementById('nombreMesa').value = '';
+            document.getElementById('totalElectores').value = '350';
+        }
+
+        function volverASeleccion() {
+            fiscalizacionActualId = null;
+            totalElectores = 0;
+            votosRegistrados = new Set();
+            historialVotos = [];
+            hojas = [];
+            numeroActual = '';
+            
+            document.getElementById('configSection').classList.add('hidden');
+            document.getElementById('mainSection').classList.add('hidden');
+            document.getElementById('seleccionSection').classList.remove('hidden');
+            
+            document.getElementById('titulo').classList.remove('hidden');
+            document.getElementById('tituloMesa').classList.add('hidden');
+            
+            cargarListaFiscalizaciones();
+        }
+
+        function abrirFiscalizacion(id) {
+            const data = JSON.parse(localStorage.getItem(id));
+            if (!data) return;
+
+            fiscalizacionActualId = id;
+            totalElectores = data.totalElectores;
+            votosRegistrados = new Set(data.votosRegistrados);
+            historialVotos = data.historialVotos;
+            hojas = data.hojas;
+            numeroActual = '';
+
+            document.getElementById('seleccionSection').classList.add('hidden');
+            document.getElementById('mainSection').classList.remove('hidden');
+            
+            // AGREGAR ESTAS TRES LÍNEAS:
+            document.getElementById('titulo').classList.add('hidden');
+            document.getElementById('tituloMesa').classList.remove('hidden');
+            document.getElementById('tituloMesa').textContent = data.nombre;
+            
+            document.getElementById('infoMesa').innerHTML = `
+                <div class="orden-text">Ingrese número de orden</div>
+            `;
+            actualizarDisplay();
+        }
+
+        function eliminarFiscalizacion(id) {
+            const data = JSON.parse(localStorage.getItem(id));
+            
+            Swal.fire({
+                title: `¿Eliminar la ${data.nombre}?`,
+                text: 'Esta acción no se puede deshacer',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    localStorage.removeItem(id);
+                    cargarListaFiscalizaciones();
+                    Swal.fire({
+                        title: '¡Eliminada!',
+                        text: 'La fiscalización ha sido eliminada',
+                        icon: 'success',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }
+            });
+        }
+
+        function iniciarFiscalizacion() {
+            // Limpiar errores previos
+            document.getElementById('errorMesa').classList.add('hidden');
+            document.getElementById('errorElectores').classList.add('hidden');
+            document.getElementById('nombreMesa').classList.remove('input-error');
+            document.getElementById('totalElectores').classList.remove('input-error');
+            
+            const mesaNum = parseInt(document.getElementById('nombreMesa').value);
+            const inputElectores = document.getElementById('totalElectores').value;
+            const totalElec = parseInt(inputElectores);
+            
+            let hayError = false;
+            
+            // Validar número de mesa
+            if (!mesaNum || mesaNum < 1 || mesaNum > 99999) {
+                document.getElementById('errorMesa').textContent = 'Por favor ingrese un número de mesa válido entre 1 y 99999';
+                document.getElementById('errorMesa').classList.remove('hidden');
+                document.getElementById('nombreMesa').classList.add('input-error');
+                hayError = true;
+            }
+            
+            // Validar total de electores
+            if (totalElec < 1 || totalElec > 400) {
+                document.getElementById('errorElectores').textContent = 'Por favor ingrese un número válido entre 1 y 400';
+                document.getElementById('errorElectores').classList.remove('hidden');
+                document.getElementById('totalElectores').classList.add('input-error');
+                hayError = true;
+            }
+            
+            // Si hay errores, no continuar
+            if (hayError) {
+                return;
+            }
+            
+            // Si todo está bien, continuar
+            const nombre = `Mesa ${mesaNum}`;
+            totalElectores = totalElec;
+
+            fiscalizacionActualId = 'fisc_' + Date.now();
+            
             document.getElementById('configSection').classList.add('hidden');
             document.getElementById('mainSection').classList.remove('hidden');
+            
+            document.getElementById('titulo').classList.add('hidden');
+            document.getElementById('tituloMesa').classList.remove('hidden');
+            document.getElementById('tituloMesa').textContent = nombre;
+            document.getElementById('infoMesa').innerHTML = `
+                <div class="orden-text">Ingrese número de orden</div>
+            `;
 
             crearHojas();
-            cargarDatos();
+            guardarDatos(nombre);
             actualizarDisplay();
         }
 
@@ -57,6 +220,8 @@
 
             if (!numeroActual || numero < 1 || numero > totalElectores) {
                 mostrarMensaje('error', `Ingrese un número entre 1 y ${totalElectores}`);
+                numeroActual = '';
+                actualizarDisplay();
                 return;
             }
 
@@ -100,15 +265,25 @@
         }
 
         function reiniciar() {
-            if (confirm('¿Seguro que desea reiniciar todos los datos?')) {
-                votosRegistrados.clear();
-                historialVotos = [];
-                hojas.forEach(h => h.votos = 0);
-                numeroActual = '';
-                actualizarDisplay();
-                guardarDatos();
-                mostrarMensaje('success', 'Datos reiniciados');
-            }
+            Swal.fire({
+                title: '¿Seguro que desea borrar todos los datos?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Sí, reiniciar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    votosRegistrados.clear();
+                    historialVotos = [];
+                    hojas.forEach(h => h.votos = 0);
+                    numeroActual = '';
+                    actualizarDisplay();
+                    guardarDatos();
+                    mostrarMensaje('success', 'Datos reiniciados');
+                }
+            });
         }
 
         function mostrarEstado() {
@@ -153,14 +328,20 @@
             }, 2500);
         }
 
-        function guardarDatos() {
+        function guardarDatos(nombre) {
+            if (!fiscalizacionActualId) return;
+            
+            const nombreFisc = nombre || JSON.parse(localStorage.getItem(fiscalizacionActualId))?.nombre || 'Mesa sin nombre';
+            
             const datos = {
+                nombre: nombreFisc,
                 totalElectores,
                 votosRegistrados: Array.from(votosRegistrados),
                 historialVotos,
-                hojas
+                hojas,
+                fecha: new Date().toISOString()
             };
-            localStorage.setItem('fiscalizacion', JSON.stringify(datos));
+            localStorage.setItem(fiscalizacionActualId, JSON.stringify(datos));
         }
 
         function cargarDatos() {
@@ -260,3 +441,32 @@ function eliminarVoto(numero, numeroHoja) {
         }
     }
 }
+
+    function confirmarVolverInicio() {
+        Swal.fire({
+            title: '¿Volver a la pantalla de inicio?',
+            text: 'Los datos de esta fiscalización están guardados.',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#667eea',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Sí, volver',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                volverASeleccion();
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('nombreMesa').addEventListener('input', () => {
+        document.getElementById('errorMesa').classList.add('hidden');
+        document.getElementById('nombreMesa').classList.remove('input-error');
+    });
+    
+    document.getElementById('totalElectores').addEventListener('input', () => {
+        document.getElementById('errorElectores').classList.add('hidden');
+        document.getElementById('totalElectores').classList.remove('input-error');
+    });
+});

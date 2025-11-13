@@ -4,24 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fiscalización</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
+     <div class="container">
         <h1 id="titulo">📋 Fiscalización</h1>
-        
-        <div id="configSection" class="config-section">
+        <div id="tituloMesa" class="titulo-mesa hidden"></div>
+        <!-- Pantalla inicial: selección de fiscalización -->
+        <div id="seleccionSection">
+            <div class="lista-fiscalizaciones" id="listaFiscalizaciones">
+                <!-- Se llenará dinámicamente -->
+            </div>
+            <button class="btn-nueva" onclick="mostrarConfiguracion()">➕ Nueva Fiscalización</button>
+        </div>
+
+        <!-- Configuración de nueva fiscalización -->
+        <div id="configSection" class="config-section hidden">
+            <button class="btn-volver" onclick="volverASeleccion()">← Volver</button>
             <div class="alerta-fijate">
                 ⚠️ Antes de ingresar la cantidad de electores, consulte con el presidente de mesa.  
                 Es posible que haya electores adicionales que no figuren en la hoja entregada por su partido.
             </div>
+            <label>Número de Mesa (1-99999):</label>
+            <input type="number" id="nombreMesa" placeholder="99999" min="1" max="99999">
+            <span id="errorMesa" class="error-message hidden"></span>
+            
             <label>Total de electores en esta mesa:</label>
             <input type="number" id="totalElectores" value="350" min="1" max="400">
+            <span id="errorElectores" class="error-message hidden"></span>
+            
             <button onclick="iniciarFiscalizacion()">Iniciar Fiscalización</button>
         </div>
 
         <div id="mainSection" class="hidden">
             <div id="message" class="message"></div>
+
+            <div id="infoMesa" class="info-mesa"></div>
 
             <div class="display-section">
                 <div id="numberDisplay">-</div>
@@ -48,8 +68,9 @@
                 <button class="progress-btn" onclick="mostrarProgreso()">📋 Progreso</button>
             </div>
 
-            <div class="action-buttons">
+           <div class="action-buttons">
                 <button id="undoBtn" onclick="deshacerUltimo()">↶ Deshacer</button>
+                <button id="volverInicioBtn" onclick="confirmarVolverInicio()">🏠 Volver a Inicio</button>
                 <button id="clearBtn" onclick="reiniciar()">🔄 Reiniciar</button>
             </div>
         </div>
@@ -68,16 +89,16 @@
                     <div class="stat-value" id="votosCount">0</div>
                 </div>
                 <div class="stat-box">
+                    <div class="stat-label">% Votó</div>
+                    <div class="stat-value" id="porcentajeVoto">0%</div>
+                </div>
+                <div class="stat-box">
                     <div class="stat-label">Total Mesa</div>
                     <div class="stat-value" id="totalMesa">0</div>
                 </div>
                 <div class="stat-box">
                     <div class="stat-label">Faltan</div>
                     <div class="stat-value" id="faltanCount">0</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-label">% Votó</div>
-                    <div class="stat-value" id="porcentajeVoto">0%</div>
                 </div>
             </div>
         </div>

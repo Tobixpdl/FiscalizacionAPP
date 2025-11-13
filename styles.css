@@ -25,9 +25,12 @@
 
         h1 {
             text-align: center;
-            color: #333;
             margin-bottom: 20px;
-            font-size: 22px;
+            color: #333;
+        }
+
+        #info{
+            margin-bottom: 5px;
         }
 
         .config-section {
@@ -204,12 +207,12 @@
         /* Botones de acción secundarios */
         .action-buttons {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr;
             gap: 10px;
             width: 100%;
         }
 
-        #undoBtn, #clearBtn {
+        #undoBtn, #clearBtn, #volverInicioBtn {
             padding: 12px;
             font-size: 14px;
             font-weight: bold;
@@ -450,8 +453,142 @@
     padding: 10px;
     border-radius: 8px;
     margin-bottom: 12px;
-    font-size: 16px;
+    font-size: 14px;
     border: 1px solid #ffeeba;
+}
+
+/* Sección de selección de fiscalizaciones */
+#seleccionSection {
+    width: 100%;
+}
+
+.lista-fiscalizaciones {
+    margin-bottom: 20px;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.sin-fiscalizaciones {
+    text-align: center;
+    padding: 40px 20px;
+    color: #999;
+    font-size: 16px;
+}
+
+.item-fiscalizacion {
+    background: #f5f5f5;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.fisc-info {
+    flex: 1;
+}
+
+.fisc-nombre {
+    font-size: clamp(12px, 4vw, 18px); 
+    overflow: hidden;                  
+    text-overflow: ellipsis;           
+}
+
+.fisc-stats {
+    font-size: 14px;
+    color: #667eea;
+    font-weight: 600;
+}
+
+.fisc-fecha {
+    font-size: 12px;
+    color: #999;
+    margin-top: 3px;
+}
+
+.fisc-acciones {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-abrir {
+    background: #667eea;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-abrir:active {
+    background: #5568d3;
+}
+
+.btn-eliminar {
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.btn-eliminar:active {
+    background: #dc2626;
+}
+
+.btn-nueva {
+    width: 100%;
+    padding: 18px;
+    background: #10b981;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-nueva:active {
+    background: #059669;
+}
+
+.btn-volver {
+    width: 100%;
+    padding: 12px;
+    background: #6b7280;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-bottom: 15px;
+}
+
+.btn-volver:active {
+    background: #4b5563;
+}
+
+.btn-volver-lista {
+    width: 100%;
+    padding: 12px;
+    background: #6b7280;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 15px;
+}
+
+.btn-volver-lista:active {
+    background: #4b5563;
 }
 
 @keyframes parpadeo {
@@ -460,8 +597,59 @@
 }
 
 
+#volverInicioBtn {
+    background: #6b7280;
+    color: white;
+}
 
+#volverInicioBtn:active {
+    background: #4b5563;
+}
 
+.info-mesa {
+    text-align: center;
+    margin-bottom: 8px;
+}
 
+.mesa-text {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+}
 
+.orden-text {
+    font-size: 14px;
+    color: #666;
+    opacity: 0.9;
+    margin-top: 2px;
+}
 
+.titulo-mesa {
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+    padding: 8px;
+    background: #f0f0f0;
+    border-radius: 10px;
+
+}
+
+.error-message {
+    display: block;
+    color: #dc2626;
+    background: #fee2e2;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    border-left: 3px solid #dc2626;
+}
+
+.config-section input.input-error {
+    border-color: #dc2626;
+    background: #fef2f2;
+}
